@@ -11,21 +11,31 @@ import UIKit
 class ViewController: UIViewController {
     
     @IBOutlet weak var titleLabel: UILabel!
+    @IBOutlet weak var progressView: UIProgressView!
     
-    let eggTimes: [String: Int] = ["Soft": 1, "Medium": 2, "Hard": 3]
+    let eggTimes: [String: Int] = ["Soft": 5, "Medium": 6, "Hard": 7]
     var timer = Timer()
+    
+    
+    override func viewDidLoad() {
+        progressView.progress = 0
+    }
         
     @IBAction func hardnessSelected(_ sender: UIButton) {
-        timer.invalidate()
-        
+        // Check if button title exists
         guard let hardness = sender.currentTitle else { return }
         
-        var timeRemaining = eggTimes[hardness]!
+        // Stop any on going timer
+        timer.invalidate()
+        
+        // Get the right time according to the button
+        let timeNeeded = eggTimes[hardness]!
+        var timePassed = 0
         
         timer = Timer.scheduledTimer(withTimeInterval: 1.0, repeats: true) { timer in
-            if timeRemaining > 0 {
-                print("\(timeRemaining) seconds")
-                timeRemaining -= 1
+            if timePassed < timeNeeded {
+                timePassed += 1
+                self.progressView.progress = Float(timePassed) / Float(timeNeeded)
             } else {
                 self.titleLabel.text = "\(hardness) egg done"
                 timer.invalidate()
