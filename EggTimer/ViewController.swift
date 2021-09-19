@@ -7,6 +7,7 @@
 //
 
 import UIKit
+import AVFoundation
 
 class ViewController: UIViewController {
     
@@ -15,6 +16,7 @@ class ViewController: UIViewController {
     
     let eggTimes: [String: Int] = ["Soft": 5, "Medium": 6, "Hard": 7]
     var timer = Timer()
+    var alarmPlayer: AVAudioPlayer?
     
     
     override func viewDidLoad() {
@@ -31,6 +33,8 @@ class ViewController: UIViewController {
         // Get the right time according to the button
         let timeNeeded = eggTimes[hardness]!
         var timePassed = 0
+        progressView.progress = 0
+        titleLabel.text = hardness
         
         timer = Timer.scheduledTimer(withTimeInterval: 1.0, repeats: true) { timer in
             if timePassed < timeNeeded {
@@ -39,7 +43,26 @@ class ViewController: UIViewController {
             } else {
                 self.titleLabel.text = "\(hardness) egg done"
                 timer.invalidate()
+                self.playAlarm()
             }
         }
+    }
+    
+    func playAlarm() {
+        guard let url = Bundle.main.url(forResource: "alarm_sound", withExtension: "mp3") else { return }
+        
+        do {
+            try AVAudioSession.sharedInstance().setCategory(.playback, mode: .default)
+            try AVAudioSession.sharedInstance().setActive(true)
+            
+            alarmPlayer = try AVAudioPlayer(contentsOf: url)
+             
+            guard let alarmPlayer = alarmPlayer else { return }
+            
+            alarmPlayer.play()
+        } catch let error {
+            print(error.localizedDescription)
+        }
+        
     }
 }
